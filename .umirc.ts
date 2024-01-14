@@ -6,6 +6,7 @@ export default defineConfig({
     history: {
         type: 'hash',
     },
+    esbuildMinifyIIFE: true,
     routes: [
         {
             path: '/',
