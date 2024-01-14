@@ -1,5 +1,6 @@
+import loading from '@/assets/loading.svg';
 import { useCreation, useMemoizedFn } from 'ahooks';
-import { Button, Dropdown, Spin } from 'antd';
+import { Button, ConfigProvider, Dropdown, Image, Spin } from 'antd';
 import { TagCloud } from 'react-tagcloud';
 
 const HomeView = ({
@@ -34,15 +35,26 @@ const HomeView = ({
         },
     ]);
 
+    const tagsProcessed: Array<any> = useCreation(() => {
+        return tags.map((value) => {
+            return {
+                ...value,
+                count: 1,
+                color: randomColor(),
+                items: getItems(value),
+            };
+        });
+    }, [tags]);
+
     const renderer = useMemoizedFn((tag) => {
         return (
-            <Dropdown arrow key={tag.value} menu={{ items: getItems(tag) }}>
+            <Dropdown arrow key={tag.value} menu={{ items: tag.items }}>
                 <Button
                     shape="round"
                     style={{
                         fontWeight: 'bold',
                         margin: 2,
-                        backgroundColor: randomColor(),
+                        backgroundColor: tag.color,
                         border: 'none',
                         color: 'white',
                     }}
@@ -56,12 +68,26 @@ const HomeView = ({
     return (
         <>
             <TagCloud
-                tags={tags}
+                tags={tagsProcessed}
                 maxSize={50}
                 minSize={20}
                 renderer={renderer}
             />
-            <Spin size="large" fullscreen spinning={spinning} />
+            <ConfigProvider
+                theme={{ token: { colorBgMask: 'rgba(0, 0, 0, 0)' } }}
+            >
+                <Spin
+                    indicator={
+                        <Image
+                            preview={false}
+                            style={{ width: 150, height: 150 }}
+                            src={loading}
+                        />
+                    }
+                    fullscreen
+                    spinning={spinning}
+                />
+            </ConfigProvider>
         </>
     );
 };
